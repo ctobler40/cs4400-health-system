@@ -1,0 +1,100 @@
+CS 4400 Group 9 Project
+Sample of our Code:
+
+server.js
+- This is where we called all of our SQL queries to get, add, remove, and update our database information
+- Below is an example of a query to gather patient information:
+
+app.get('/api/data/patient-info/:id', (req, res) => {
+  const { id } = req.params;   // ID of our patient
+  const query = `   // mySQL Query
+    select 
+        p.id,
+        p.first_name,
+        p.last_name,
+        p.email,
+        p.username,
+        p.pass_word as "password",
+        p.age, 
+        p.date_of_birth,
+        p.contact_number,
+        e.first_name as "physician_first_name",
+        e.last_name as "physician_last_name",
+        e.email as "physician_email",
+        e.age as "physician_age", 
+        e.date_of_birth as "physician_dob",
+        h.hospital_name,
+        h.city
+    from patient p
+    inner join employee e on p.physician_id = e.id
+    inner join hospital h on p.hospital_id = h.id
+    where p.id = ?;
+  `;   // Customize your query
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err });   // Results returned
+    }
+    res.json(results);
+  });
+});
+
+
+
+MainPage.jsx:
+- This was where we displayed our main table of all of our information
+- Below are some examples from this page:
+
+- These buttons would update the route for SQL to grab information from, allowing us to get different types of information
+<div>
+    <button className='button3' onClick={() => setNewRoute('http://localhost:6500/api/data/patient')}>Get Patients</button>
+    <button className='button3' onClick={() => setNewRoute('http://localhost:6500/api/data/employee')}>Get Employees</button>
+    <button className='button3' onClick={() => setNewRoute('http://localhost:6500/api/data/hospital')}>Get Hospitals</button>
+</div>
+
+- This displayed all users currently in our hospital patient database
+- Pressing the info button would open up all of the information needed about that user
+- Pressing the delete button would remove them from the database
+Array.isArray(data) && data.map(item => (
+<div className="card-item" key={item.id}>
+    <div>{item.first_name} {item.last_name}</div>
+    <div>{item.age} years old</div>
+    <div>Admitted {item.admission_date}</div>
+    <div>
+    <button className='button3' onClick={() => fetchPatientInfo(item.id)}>Info</button>
+    {/*<button className='button3' onClick={() => selectPersonForUpdate(item)}>Update</button>*/}
+    <Delete id={item.id} setData={setData} route={route} />
+    </div>
+</div>
+))
+
+
+
+App.css
+- Lastly, this page was important for our actual appearance. Without this file, the site would look too simple and bland
+- Below are some examples of styles we got from this file:
+
+- Most followed this pattern / style: With a focus and placeholder called as well to help them pop out
+input {
+  background-color: #f0f0f0; /* Light gray background for readability */
+  color: #1a1a1a; /* Dark text for contrast */
+  border: 2px solid #444; /* Consistent with buttons and textarea */
+  border-radius: 8px; /* Rounded corners for consistency */
+  font-family: Arial, sans-serif; /* Uniform font style */
+  font-size: 1em; /* Readable font size */
+  padding: 10px; /* Comfortable padding for interaction */
+  margin: 2px 0; /* Space around the input fields */
+  width: 94%; /* Full width of the parent container */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth interaction effects */
+}
+
+input:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #9acd32; /* Highlight border on focus */
+  box-shadow: 0px 0px 10px rgba(154, 205, 50, 0.5); /* Soft glow effect on focus */
+}
+
+input::placeholder {
+  color: #888; /* Muted placeholder text for clarity */
+  font-style: italic; /* Distinguishes placeholder from user input */
+}
